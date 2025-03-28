@@ -1,23 +1,23 @@
-// src/middlewares/authGuard.ts
+
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 
-export const authGuard = (req: Request, res: Response, next: NextFunction) => {
-  const authHeader = req.headers.authorization;
+interface CustomRequest extends Request {
+  userId?: string;
+}
 
-  if (!authHeader) {
-    return res.status(401).json({ error: 'Token não fornecido' });
+export const authGuard = (req: CustomRequest, res: Response, next: NextFunction) => {
+  const token = req.headers.authorization?.split(' ')[1];
+
+  if (!token) {
+    return res.status(401).json({ error: 'Token de autenticação não fornecido.' });
   }
-
-  const [, token] = authHeader.split(' '); // Bearer <token>
 
   try {
-    const decoded = jwt.verify(token, 'seuSegredoJWT') as { id: string };
-    req.userId = decoded.id; // Agora não dá mais erro de tipo!
+    const decoded: any = jwt.verify(token, 'seuSegredoJWT');
+    req.userId = decoded.id;
     next();
-  } catch (err) {
-    return res.status(401).json({ error: 'Token inválido' });
+  } catch (error) {
+    return res.status(401).json({ error: 'Token inválido ou expirado.' });
   }
 };
-
-export default authGuard;

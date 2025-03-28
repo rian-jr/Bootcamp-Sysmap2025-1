@@ -1,5 +1,4 @@
-import express, { Router } from 'express';
-import { authGuard } from '../middlewares/authGuard';
+import { Router } from 'express';
 import {
     updateProfile,
     uploadProfilePhoto,
@@ -10,12 +9,14 @@ import {
 } from '../controllers/userController';
 import { authMiddleware } from '../middlewares/authMiddleware'
 
-const router = express.Router
+const router = Router()
 
 router.arguments(authMiddleware)// Proteger todas as rotas
 
+
+
 router.put('profile', updateProfile)
-router.post('/profile/photo', uploadProfilePhoto)
+router.post('profile/photo', uploadProfilePhoto)
 router.put('interests', updateInterests)
 router.delete('deactivate', deactivateAccount)
 router.post('experience', addExperience)
